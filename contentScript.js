@@ -18,5 +18,87 @@ How the extension will work:
     is likely to retrieve reposted job status for next page too 
 */
 
-// boAvmrAFfwZEHebYjctgTppwiEwazqIftEMU             job title class identifier 
+// strong tag     job title identifier 
+// boAvmrAFfwZEHebYjctgTppwiEwazqIftEMU            company class identifier 
 // job-card-container__footer-item job-card-container__footer-job-state t-bold      viewed job class identifier 
+console.log("hello");
+// Linkedin is SPA so content script would not be able to detect when a job query page is loaded
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+   if (message.action === 'filterPage') {
+       const title = document.title;
+       console.log(window.location.href);
+      filterVisiblePage()
+   }
+});
+
+function filterVisiblePage() {
+   filters = filters = {
+      reposted: false,
+      viewed: false,
+      jobTitles: false,
+      companyNames: false,
+      jobTitleFiltersList: [],
+      companyFiltersList: {}
+   }
+
+   chrome.storage.local.get("linkedInFilters", function(data) {
+      if (chrome.runtime.lastError) {
+          console.error("Error retrieving data from storage:", chrome.runtime.lastError);
+      } else {
+         // Check if the key exists in the retrieved data
+         if (data["linkedInFilters"] != undefined) {
+            filters = data["linkedInFilters"];
+            filters["companyFiltersList"] = new Set(filters["companyFiltersList"]);
+         }
+         
+         removeVisibleJobs(filters);
+      }
+  });
+} 
+
+function removeVisibleJobs(filters) {
+   console.log(filters);
+   // jobs are displayed using li 
+   let jobs = document.getElementsByClassName("grgNrGjNrPlqhrUKNoLxOvXUjtzhHtSTQ");
+
+   for (let i = jobs.length-1; i >= 0; i--) {
+      jobTitleInFilter = false;
+      viewedJob = false;
+      companyNameInFilter = false;
+
+      if (filters.companyNames) {
+         let companyName = jobs[i].getElementsByClassName('boAvmrAFfwZEHebYjctgTppwiEwazqIftEMU')[0].textContent.trim().split(" ·")[0];
+         console.log(companyName);
+         if (filters.companyFiltersList.has(companyName)) {
+            companyNameInFilter = true;
+         }
+      }
+
+      if (filters.viewed) {
+         let viewStatus = jobs[i].getElementsByClassName("job-card-container__footer-job-state")[0];
+         if (filters.viewed && viewStatus != undefined) {
+            viewedJob = true;
+         }
+      }
+
+      if (filters.jobTitles) {
+         let jobTitle = jobs[i].querySelector("strong").textContent.toLowerCase();
+         if (filters.jobTitles) {
+            for (let a = 0; a < filters.jobTitleFiltersList.length; a++) {
+               if (filters.jobTitleFiltersList[a] != '' && jobTitle.includes(filters.jobTitleFiltersList[a].toLowerCase())) {
+                  jobTitleInFilter = true;
+                  break;
+               }
+            }
+         }
+      }
+      // viewedJob
+      // companyNameInFilter
+      // jobTitleInFilter
+      if (companyNameInFilter || viewedJob || jobTitleInFilter) {
+         jobs[i].style.color = 'red';
+         //jobs[i].remove();
+         console.log(jobs[i]);
+      }
+   }
+}

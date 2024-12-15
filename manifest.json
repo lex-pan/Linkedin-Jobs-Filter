@@ -8,11 +8,12 @@
         "128": "extension.png"
     },
     "permissions": [
+        "tabs",
         "storage",
         "webRequest"
     ],
     "host_permissions": [
-        "https://www.linkedin.com/jobs/search/*"
+        "https://www.linkedin.com/jobs/search/*", "http://127.0.0.1/*"
     ],
     "background": {
         "service_worker": "background.js"
@@ -27,7 +28,7 @@
     },
     "content_scripts":[
         {
-            "matches": ["https://www.linkedin.com/jobs/search/*"],
+            "matches": ["https://www.linkedin.com/*", "http://127.0.0.1/*"],
             "js": ["contentScript.js"]
         }
     ]

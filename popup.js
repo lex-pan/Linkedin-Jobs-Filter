@@ -44,7 +44,7 @@ function filterList() {
     document.getElementsByClassName("apply-changes")[0].removeEventListener('click', saveChecklist);
     extensionHtml.innerHTML = `
         <h1 class="extension-title">Linkedin Jobs Blacklist</h1>
-        <textarea class="list-of-filters" placeholder="Enter the words or phrases you want to exclude from ${filterType}, one per line.">${filterType == 'job titles' ? Array.from(filters.jobTitleFiltersList).join('\n') : Array.from(filters.companyFiltersList).join('\n')}</textarea>
+        <textarea class="list-of-filters" placeholder="Enter the words or phrases you want to exclude from ${filterType}, one per line. ${filterType == 'job titles' ? 'Job titles filter out jobs with matching keywords.' : 'Company names must exactly match the company you want to block.'}">${filterType == 'job titles' ? Array.from(filters.jobTitleFiltersList).join('\n') : Array.from(filters.companyFiltersList).join('\n')}</textarea>
         <button class="apply-changes">Cancel</button>
         <button class="apply-changes">Save Changes</button>
     `;
